@@ -185,6 +185,128 @@ void ofxFaceShift::import(string modelFolder) {
 	imported = true;
 }
 
+
+// this is really rough c++ port of code that JAM3 has for javascript parsing of text based faceshift data
+// needs some cleaning up
+
+void ofxFaceShift::parse(string line){
+    
+    blendNeedsUpdating = true;
+    
+    vector < string > tokens = ofSplitString(line, " ");
+    found = true;
+    
+    int curBlockCount = 0;
+    for (int i = 0; i < tokens.size(); i++){
+        if (tokens[i] == "FS"){
+            
+            curBlockCount = ofToInt( tokens[ i + 1 ] );
+            i++;
+            
+        } else if (tokens[i] == "I"){
+            
+            float time = ofToFloat(tokens[ i + 1 ]);
+            timestamp = time;
+            cout << timestamp << endl;
+            
+            i++;
+            
+            //start of headers
+        } else if (tokens[i] == ""){
+            
+            curBlockCount = 0;
+            
+            //head rotation, translation
+        } else if  (tokens[i] == "P"){
+            
+            
+            rotation.x() = ofToFloat(tokens[i + 1]);
+            rotation.y() =  ofToFloat(tokens[i + 2]);
+            rotation.z() =  ofToFloat(tokens[i + 3]);
+            position.x = ofToFloat(tokens[i + 4]);
+            position.y =  ofToFloat(tokens[i + 5]);
+            position.z =  ofToFloat(tokens[i + 6]);
+            
+            i += 7;
+            
+            
+            //blend shape coeffecients (pretty well ignored right now)
+        } else if  (tokens[i] == "C"){
+            
+            int numCoeffecients = ofToInt( tokens[ i + 1 ] );
+            
+            
+            blendshapeWeights.clear();
+            unsigned int blendshapeCount;
+            blendshapeCount =numCoeffecients;
+            
+            //                readRaw(data, blendshapeCount);
+            for(int j = 0; j < blendshapeCount; j++) {
+                float blendshapeWeight;
+                //readRaw(data, blendshapeWeight);
+                
+                blendshapeWeights.push_back(ofToFloat(tokens[i+2+j]));
+                //cout << "blendshapeWeights" << " " << blendshapeWeights[blendshapeWeights.size() -1] << endl;
+            }
+            
+            
+            //cout << blendshapeWeights.size() << endl;
+            
+            
+            //blockData.coefficients = getVectorData( numCoeffecients, j + 2, curBlock );
+            
+            i += numCoeffecients + 1;
+            
+            
+            //eye rotations
+        }else if (tokens[i] == "E"){
+            
+            
+            
+            // TODO eye rotations
+            
+            //int eyes = blockData.eyes;
+            //eyes.left = getVectorData( 2, j + 1, curBlock );
+            //eyes.right = getVectorData( 2, j + 3, curBlock );
+            
+            i += 4;
+            
+            
+            //marker data
+        } else if (tokens[i] == "M"){
+            
+            int numMarkers = ofToInt( tokens[ ++i ] );
+            
+            //int markers = blockData.markers = [];
+            
+            i++; //increment to the first vertex value
+            
+            markers.clear();
+            unsigned short markerCount;
+            markerCount = numMarkers;
+            
+            
+            for( int k = 0; k < numMarkers; k++ ) {
+                ofVec3f marker;
+                marker.x = ofToFloat(tokens[ i + 0]);
+                marker.y = ofToFloat(tokens[ i + 1 ]);
+                marker.z = ofToFloat(tokens[ i + 2 ]);
+                markers.push_back(marker);
+                i += 3;
+            }
+            
+            //cout << markers.size() << endl;
+            
+            
+        }
+    }
+    
+  
+    
+}
+
+
+
 // written against http://www.faceshift.com/help/studio/beta/#faceshiftstudiobeta-faceshiftOpenFormat
 bool ofxFaceShift::update() {
 	bool newFrame = false;

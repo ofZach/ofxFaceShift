@@ -37,6 +37,9 @@ public:
 	
 	ofMesh& getBlendMesh();
 	ofMesh& getBlendshapeMesh(unsigned int i);
+    
+    // [zach] -- this is for handling offline faceshift data (ascii) vs the binary that's streamed over UDP
+    void parse(string line);
 	
 protected:
 	ofxUDPManager udpConnection;
