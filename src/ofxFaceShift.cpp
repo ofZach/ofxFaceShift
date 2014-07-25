@@ -219,14 +219,27 @@ void ofxFaceShift::parse(string line){
             //head rotation, translation
         } else if  (tokens[i] == "P"){
             
-            
-            rotation.x() = ofToFloat(tokens[i + 1]);
-            rotation.y() =  ofToFloat(tokens[i + 2]);
-            rotation.z() =  ofToFloat(tokens[i + 3]);
-            position.x = ofToFloat(tokens[i + 4]);
+			ofQuaternion rot = ofQuaternion(
+				ofToFloat(tokens[i + 1]), 
+				ofToFloat(tokens[i + 2]), 
+				ofToFloat(tokens[i + 3]),
+				ofToFloat(tokens[i + 4]));
+
+			ofVec3f pos = ofVec3f(
+				ofToFloat(tokens[i + 5]), 
+				ofToFloat(tokens[i + 6]), 
+				ofToFloat(tokens[i + 7]));
+
+			rotation = rot;
+			position = pos;// * ofGetMouseX();
+			
+			/*
+            position.x =  ofToFloat(tokens[i + 4]);
             position.y =  ofToFloat(tokens[i + 5]);
             position.z =  ofToFloat(tokens[i + 6]);
-            
+			*/
+			//cout << "Position " << pos << endl << "Rotation " << rot << endl;
+
             i += 7;
             
             
